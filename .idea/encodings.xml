@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/mmdet/ops/carafe/src/carafe_cuda.cpp" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/mmdet/ops/carafe/src/carafe_cuda_kernel.cu" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/mmdet/ops/carafe/src/carafe_naive_cuda.cpp" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/mmdet/ops/carafe/src/carafe_naive_cuda_kernel.cu" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/mmdet/ops/chamfer_2d/src/chamfer_2d.cu" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/mmdet/ops/chamfer_2d/src/chamfer_cuda.cpp" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/mmdet/ops/dcn/src/deform_conv_cuda.cpp" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/mmdet/ops/dcn/src/deform_conv_cuda_kernel.cu" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/mmdet/ops/dcn/src/deform_pool_cuda.cpp" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/mmdet/ops/dcn/src/deform_pool_cuda_kernel.cu" charset="GB2312" />
+  </component>
+</project>

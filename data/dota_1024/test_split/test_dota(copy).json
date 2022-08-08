@@ -1,0 +1,14 @@
+{"categories":
+[{"id": 1, "name": "plane", "supercategory": "none"},
+  {"id": 2, "name": "baseball-diamond", "supercategory": "none"},
+  {"id": 3, "name": "bridge", "supercategory": "none"},
+  {"id": 4, "name": "ground-track-field", "supercategory": "none"},
+  {"id": 5, "name": "small-vehicle", "supercategory": "none"},
+  {"id": 6, "name": "large-vehicle", "supercategory": "none"},
+  {"id": 7, "name": "ship", "supercategory": "none"},
+  {"id": 8, "name": "tennis-court", "supercategory": "none"},
+  {"id": 9, "name": "basketball-court", "supercategory": "none"},
+  {"id": 10, "name": "harbor", "supercategory": "none"},
+  {"id": 11, "name": "swimming-pool", "supercategory": "none"},
+  {"id": 12, "name": "helicopter", "supercategory": "none"}],
+  "images": [{"id": "P0006", "width": 1054, "height": 1529, "file_name": "P0006.png"}]}

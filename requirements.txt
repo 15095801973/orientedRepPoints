@@ -1,0 +1,9 @@
+cython
+numpy
+imagecorruptions
+matplotlib
+terminaltables
+six
+pycocotools
+pillow==6.2.2
+timm
