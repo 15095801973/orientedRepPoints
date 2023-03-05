@@ -202,7 +202,9 @@ def _non_dist_train(model,
             seed=cfg.seed) for ds in dataset
     ]
     # put model on gpus
+    # TODO 但是我的gpu太小, 试试cpu, 但是c++没有实现cpu
     model = MMDataParallel(model.cuda(cfg.gpu_ids[0]), device_ids=cfg.gpu_ids)
+    # model = MMDataParallel(model.cpu())
 
     # build runner
     optimizer = build_optimizer(model, cfg.optimizer)
@@ -235,7 +237,7 @@ def _non_dist_train(model,
             dist=False,
             shuffle=False)
         eval_cfg = cfg.get('evaluation', {})
-        runner.register_hook(EvalHook(val_dataloader, **eval_cfg))
+        runner.register_hook(EvalHook(val_dataloader, interval=1, **eval_cfg))
 
     if cfg.resume_from:
         runner.resume(cfg.resume_from)

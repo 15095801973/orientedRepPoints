@@ -15,6 +15,7 @@ from mmdet.apis import set_random_seed, train_detector
 from mmdet.datasets import build_dataset
 from mmdet.models import build_detector
 from mmdet.utils import collect_env, get_root_logger
+from torchsummary import summary
 
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -61,7 +62,12 @@ def parse_args():
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
 
-    args.config = "F:\\360downloads\OrientedRepPoints-main\configs\dota\orientedrepoints_r50_demo.py"
+    args.config = "configs/dota/orientedrepoints_r50_demo.py"
+    args.config = "configs/dota/orientedrepoints_r50_demo(copy.py"
+    # args.config = "configs/dota/orientedrepoints_r50_demo_com.py"
+    # args.config = "configs/dota/orientedrepoints_r50_demo_pts.py"
+    # args.config = "configs/dota/orientedrepoints_r50_demo_pts_up.py"
+    args.config = "configs/dota/orientedrepoints_r50_demo_ide_nolimit.py"
     return args
 
 
@@ -104,6 +110,8 @@ def main():
     # environment info and seed, which will be logged
     meta = dict()
     # log env info
+    # todo 设置环境变量
+    # os.environ["CUDA_VISIBLE_DEVICES"] = ""
     env_info_dict = collect_env()
     env_info = '\n'.join([('{}: {}'.format(k, v))
                           for k, v in env_info_dict.items()])
@@ -111,7 +119,6 @@ def main():
     logger.info('Environment info:\n' + dash_line + env_info + '\n' +
                 dash_line)
     meta['env_info'] = env_info
-
     # log some basic info
     logger.info('Distributed training: {}'.format(distributed))
     logger.info('Config:\n{}'.format(cfg.text))
@@ -123,9 +130,11 @@ def main():
         set_random_seed(args.seed, deterministic=args.deterministic)
     cfg.seed = args.seed
     meta['seed'] = args.seed
-
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = 'cpu'
     model = build_detector(
-        cfg.model, train_cfg=cfg.train_cfg, test_cfg=cfg.test_cfg)
+        cfg.model, train_cfg=cfg.train_cfg, test_cfg=cfg.test_cfg) #.to(device)
+    # summary(model, input_size=(3, 1024, 1024))
 
     datasets = [build_dataset(cfg.data.train)]
     if len(cfg.workflow) == 2:
@@ -141,6 +150,11 @@ def main():
             CLASSES=datasets[0].CLASSES)
     # add an attribute for visualization convenience
     model.CLASSES = datasets[0].CLASSES
+    if hasattr(torch.cuda, 'empty_cache'):
+        torch.cuda.empty_cache()
+
+    # cfg.load_from = "F:\\360downloads\OrientedRepPoints-main\work_dirs\orientedreppoints_r50_demo\epoch_37.pth"
+    # args.validate = True
     train_detector(
         model,
         datasets,
@@ -153,3 +167,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    print("end_train")
