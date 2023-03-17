@@ -33,17 +33,17 @@ model = dict(
         point_feat_channels=256,
         stacked_convs=3,
         num_points=9,
-        # gradient_mul=0.3,
-        gradient_mul=0.0,
+        gradient_mul=0.3,
+        # gradient_mul=0.0,
         point_strides=[8, 16, 32, 64, 128],
         point_base_scale=2,
         norm_cfg=norm_cfg,
         loss_cls=dict(type='FocalLoss', use_sigmoid=True, gamma=2.0, alpha=0.25, loss_weight=1.0),
         # loss_cls=dict(type='FocalLoss', use_sigmoid=True, gamma=2.0, alpha=0.25, loss_weight=9.0),
-        # loss_rbox_init=dict(type='GIoULoss', loss_weight=0.375),
-        loss_rbox_init=dict(type='GIoULoss', loss_weight=1.0),
-        # loss_rbox_refine=dict(type='GIoULoss', loss_weight=1.0),
-        loss_rbox_refine=dict(type='GIoULoss', loss_weight=0.375),
+        loss_rbox_init=dict(type='GIoULoss', loss_weight=0.375),
+        # loss_rbox_init=dict(type='GIoULoss', loss_weight=1.0),
+        loss_rbox_refine=dict(type='GIoULoss', loss_weight=1.0),
+        # loss_rbox_refine=dict(type='GIoULoss', loss_weight=0.375),
         # loss_spatial_init=dict(type='SpatialBorderLoss', loss_weight=0.05),
         loss_spatial_init=dict(type='SpatialBorderLoss', loss_weight=0.05),
         # loss_spatial_refine=dict(type='SpatialBorderLoss', loss_weight=0.1),
@@ -53,15 +53,15 @@ model = dict(
         # is_division=False,
         # is_division_pts=False, # 此为common1x1卷积
         # is_division_pts=True,# 此为分类自适应卷积
-        # my_pts_mode="com3",  # "pts_up","pts_down","com1","com3","demo"
-        my_pts_mode = "ide",  # "pts_up","pts_down","com1","com3","demo"
-        # my_pts_mode="com1",  # "pts_up","pts_down","com1","com3","demo"
+        # my_pts_mode="pts_up",  # "pts_up","pts_down","com1","com3","demo"
+        # my_pts_mode = "ide",  # "pts_up","pts_down","com1","com3","demo"
+        my_pts_mode="demo",  # "pts_up","pts_down","com1","com3","demo"
     ))
 # training and testing settings
 train_cfg = dict(
     init=dict(
-        assigner=dict(type='PointAssigner', scale=4, pos_num=4),
-        # assigner=dict(type='PointAssigner', scale=4, pos_num=1),
+        # assigner=dict(type='PointAssigner', scale=4, pos_num=4),
+        assigner=dict(type='PointAssigner', scale=4, pos_num=1),
         allowed_border=-1,
         pos_weight=-1,
         debug=False),
@@ -201,14 +201,19 @@ log_level = 'INFO'
 # work_dir = 'work_dirs/orp_r50_division_common_conv5'
 # work_dir = 'work_dirs/orp_r50_division_common_conv1'
 # work_dir = 'work_dirs/orp_r50_division_ide_nolimit'
+work_dir = 'work_dirs/orp_r50_part1(val_first100'
 # work_dir = 'work_dirs/orp_r50_part1(val_first100_ide'
-work_dir = 'work_dirs/orp_r50_part1(val_first100_norefine'
+# work_dir = 'work_dirs/orp_r50_part1(val_first100_norefine'
+# work_dir = 'work_dirs/orp_r50_part1(val_first100_pts_up'
 # work_dir = 'work_dirs/orp_r50_division_common_conv0'
 
-# load_from = None
-load_from = 'work_dirs/orp_r50_part1(val_first100_norefine/latest.pth'
+load_from = None
+# load_from = 'work_dirs/orientedreppoints_r50_demo/epoch_40(author).pth'
+# load_from = 'work_dirs/orp_r50_part1(val_first100_norefine/latest.pth'
+# load_from = 'work_dirs/orp_r50_part1(val_first100_pts_up/latest.pth'
 # load_from = 'work_dirs/orp_r50_part1(val_first100_norefine/epoch_3.pth'
-# load_from = 'work_dirs/orp_r50_part1(val_first100_ide/epoch_8.pth'
+# load_from = 'work_dirs/orp_r50_part1(val_first100/epoch_12.pth'
+# load_from = 'work_dirs/orp_r50_part1(val_first100_ide/epoch_7.pth'
 # load_from = 'work_dirs/orp_r50_what_nolimit/epoch_120.pth'
 # load_from = 'work_dirs/orp_r50_division_ide_nolimit/epoch_80(ide_same_cfg0.979.pth'
 # load_from = 'work_dirs/orp_r50_what_nolimit/epoch_90(ide_0_9887.pth'
@@ -222,6 +227,8 @@ load_from = 'work_dirs/orp_r50_part1(val_first100_norefine/latest.pth'
 
 resume_from = None
 # resume_from = 'work_dirs/orp_r50_part1(val_first100_norefine/epoch_1.pth'
+# resume_from = 'work_dirs/orp_r50_part1(val_first100_norefine/latest.pth'
+# resume_from = 'work_dirs/orp_r50_part1(val_first100/epoch_9.pth'
 
 # resume_from = 'work_dirs/orientedreppoints_r50_demo/epoch_2.pth'
 # resume_from = 'work_dirs/orp_r50_division_common_conv/epoch_130.pth'

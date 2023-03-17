@@ -18,7 +18,7 @@ import math
 import matplotlib.pyplot as plt
 
 
-# version 2.1 搞清楚复现0.9887失败出现的问题
+# version 3.0 怀疑第二个dconv也限制了pts_int的发挥
 @HEADS.register_module
 class OrientedRepPointsHead(nn.Module):
     def __init__(self,
@@ -282,26 +282,6 @@ class OrientedRepPointsHead(nn.Module):
             dcn_cls_feat = self.reppoints_cls_conv(cls_feat, dcn_offset)
             cls_out = self.reppoints_cls_out(self.relu(dcn_cls_feat))
 
-        #
-        if False:
-        # if True:
-            # zero_offset = dcn_offset.new_zeros(dcn_offset.shape) - dcn_base_offset
-            # zero_dcn_cls_feat = self.reppoints_cls_conv(cls_feat, zero_offset)
-            plt.imshow(cls_feat[0, 0, :, :].cpu().detach().numpy())
-            plt.title("cls_feat")
-            plt.show()
-            plt.imshow(pts_out_init_grad_mul[0, 0, :, :].cpu().detach().numpy())
-            plt.title("pts_out_init_grad_mul")
-            plt.show()
-            plt.imshow(pts_feat[0, 0, :, :].cpu().detach().numpy())
-            plt.title("pts_feat")
-            plt.show()
-            # plt.imshow(pts_div[0, 0, :, :].cpu().detach().numpy())
-            # plt.title("pts_div0")
-            # plt.show()
-            # plt.imshow(pts_div[0, 1, :, :].cpu().detach().numpy())
-            # plt.title("pts_div1")
-            # plt.show()
 
         # 然后继续卷积,目标是分类 ;上移了
         # cls_out = self.reppoints_cls_out(self.relu(dcn_cls_feat))
@@ -309,6 +289,8 @@ class OrientedRepPointsHead(nn.Module):
         pts_out_refine = self.reppoints_pts_refine_out(self.relu(self.reppoints_pts_refine_conv(pts_feat, dcn_offset)))
         # 微调的结果加上基础值
         pts_out_refine = pts_out_refine + pts_out_init.detach()
+        # 看看只有init会怎样
+        # pts_out_refine = pts_out_init.detach()
         # print("hello")
         # 偷天换日,将pts_out_init换成pts_div,仅在test使用,可视化pts_div
         return cls_out, pts_out_init, pts_out_refine, x
@@ -649,6 +631,7 @@ class OrientedRepPointsHead(nn.Module):
         if num_pos:
             # 分类损失 采用了focalLoss
             # labels_weight全为1
+            # 但是用了index
             losses_cls = self.loss_cls(
                 cls_scores, labels, labels_weight, avg_factor=num_pos)
             pos_pts_pred_refine = pts_preds_refine[pos_inds_flatten]
@@ -775,7 +758,7 @@ class OrientedRepPointsHead(nn.Module):
         # weight inti-stage and refine-stage
         # TODO
         # qua = qua_cls + 0.2*(qua_loc_init + 0.3 * qua_ori_init) + 0.8 * (
-        #             qua_loc_refine + 0.3 * qua_ori_refine) + 0.1*pts_feats_dissimilarity +0.001 * my_qua
+        #             qua_loc_refine + 0.3 * qua_ori_refine) + 0.1*pts_feats_dissimilarity
         # 分配各项的权重
         qua = qua_cls + 0.2 * (qua_loc_init + 0.3 * qua_ori_init) + 0.8 * (
                 qua_loc_refine + 0.3 * qua_ori_refine) + 0.1 * pts_feats_dissimilarity
@@ -863,7 +846,7 @@ class OrientedRepPointsHead(nn.Module):
                 # level_mask 一次只考虑一个层级
                 level_mask = pos_level_mask[level]
                 level_gt_mask = level_mask & gt_mask
-                # topk largest 从小到大,每个gt每层最多6个gt选出
+                # topk largest=False 从小到大,每个gt每层最多6个gt选出
                 # 每层最多选出6个,所有层级选完之后还有再进行选择
                 value, topk_inds = quality_assess[level_gt_mask].topk(
                     min(level_gt_mask.sum(), 6), largest=False)
