@@ -41,6 +41,8 @@ def DOTA2COCOTrain(srcpath, destfile, cls_names, difficult='2'):
 
             single_image = {}
             single_image['file_name'] = basename + '.png'
+            # single_image['file_name'] = imagepath
+
             single_image['id'] = image_id
             single_image['width'] = width
             single_image['height'] = height
@@ -110,15 +112,23 @@ def DOTA2COCOTest(srcpath, destfile, cls_names):
 
 if __name__ == '__main__':
 
-    DOTA2COCOTrain(r'/mnt/SSD/lwt_workdir/s2anet_branch/data/dota_1024_ms_s2anet/trainval_split/',
-                  r'/mnt/SSD/lwt_workdir/s2anet_branch/data/dota_1024_ms_s2anet/trainval_split/trainval_coco_8points.json',
+    # DOTA2COCOTrain(r'/mnt/SSD/lwt_workdir/s2anet_branch/data/dota_1024_ms_s2anet/trainval_split/',
+    #               r'/mnt/SSD/lwt_workdir/s2anet_branch/data/dota_1024_ms_s2anet/trainval_split/trainval_coco_8points.json',
+    #               wordname_15)
+    path = 'F:/360downloads\OrientedRepPoints-main\data\dota_1024/trainval_split'
+    # path = 'F:/360downloads/part1(1)'
+    path = 'F:/360downloads/part1(val'
+    outpath = 'F:/360downloads\OrientedRepPoints-main\data\dota_1024/trainval_split/trainval_coco_8points.json'
+    outpath = 'F:/360downloads\OrientedRepPoints-main\data\dota_1024/trainval_split/trainval_coco_8points(val_basename.json'
+    DOTA2COCOTrain(path,
+                  outpath,
                   wordname_15)
     #DOTA2COCOTrain(r'/mnt/SSD/lwt_workdir/s2anet_branch/data/ucas_aod/Train/',
      #             r'/mnt/SSD/lwt_workdir/s2anet_branch/data/ucas_aod/Train/trainval_coco_8point.json',
       #            ucas_aod)
-    DOTA2COCOTest(r'/mnt/SSD/lwt_workdir/s2anet_branch/data/dota_1024_ms_s2anet/test_split/',
-                 r'/mnt/SSD/lwt_workdir/s2anet_branch/data/dota_1024_ms_s2anet/test_split/test_coco_8point.json',
-                 wordname_15)
+    # DOTA2COCOTest('F:/360downloads\OrientedRepPoints-main\data\dota_1024/test_split/',
+    #              'F:/360downloads\OrientedRepPoints-main\data\dota_1024/test_split/test_coco_8points.json',
+    #              wordname_15)
     # DOTA2COCOTest(r'/mnt/SSD/lwt_workdir/s2anet_branch/data/ucas_aod/Test/',
     #               r'/mnt/SSD/lwt_workdir/s2anet_branch/data/ucas_aod/Test/test_coco_8point.json',
     #               ucas_aod)

@@ -86,6 +86,9 @@ class PointAssigner(BaseAssigner):
 
         gt_bboxes_wh = (gt_bboxes[:, 2:] - gt_bboxes[:, :2]).clamp(min=1e-6)
         scale = self.scale
+        # lvl_min为3, scale为4,所以理想上视4*8=32像素宽高的物体为lvl3,而lvl7应该是512*512
+        # lvln中一个基点占(2^n)个像素宽度
+        # 所以理想上是在4*4的自适应范围
         gt_bboxes_lvl = ((torch.log2(gt_bboxes_wh[:, 0] / scale) +
                           torch.log2(gt_bboxes_wh[:, 1] / scale)) / 2).int()
         gt_bboxes_lvl = torch.clamp(gt_bboxes_lvl, min=lvl_min, max=lvl_max)

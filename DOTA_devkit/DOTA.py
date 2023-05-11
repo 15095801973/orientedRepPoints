@@ -112,10 +112,10 @@ class DOTA:
             imgs.append(img)
         return imgs
 
-# if __name__ == '__main__':
-#     examplesplit = DOTA('examplesplit')
-#     imgids = examplesplit.getImgIds(catNms=['plane'])
-#     img = examplesplit.loadImgs(imgids)
-#     for imgid in imgids:
-#         anns = examplesplit.loadAnns(imgId=imgid)
-#         examplesplit.showAnns(anns, imgid, 2)
+if __name__ == '__main__':
+    examplesplit = DOTA('F:/360downloads\OrientedRepPoints-main\data\dota_1024/test_split')
+    imgids = examplesplit.getImgIds(catNms=['large-vehicle'])
+    img = examplesplit.loadImgs(imgids)
+    for imgid in imgids:
+        anns = examplesplit.loadAnns(imgId=imgid)
+        examplesplit.showAnns(anns, imgid, 2)

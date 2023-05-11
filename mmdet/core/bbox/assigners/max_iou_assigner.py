@@ -130,6 +130,7 @@ class MaxIoUAssigner(BaseAssigner):
         pos_inds = max_overlaps >= self.pos_iou_thr
         assigned_gt_inds[pos_inds] = argmax_overlaps[pos_inds] + 1
 
+        # 后面的分配可能会覆盖前面的, 意味着后面的给每个gt分配det的优先级更高
         # 4. assign fg: for each gt, proposals with highest IoU
         for i in range(num_gts):
             if gt_max_overlaps[i] >= self.min_pos_iou:

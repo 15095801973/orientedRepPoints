@@ -18,6 +18,7 @@ def convex_giou(pred, target):
 
 def convex_iou(pred, target):
     ex_num, gt_num = pred.size(0), target.size(0)
+    # ex_num, gt_num = pred.shape[0], target.shape[0]
     convex_ious = convex_iou_cuda.convex_iou(pred, target)
     convex_ious = convex_ious.reshape(ex_num, gt_num)
     return convex_ious

@@ -318,7 +318,7 @@ def tpfp_orp(det_bboxes,
     """end """
     # ious = bbox_overlaps(det_bboxes, gt_bboxes)
     # for each det, the max iou with all gts
-    print(ious.shape, num_dets, num_gts)
+    # print(ious.shape, num_dets, num_gts)
     ious_max = ious.max(axis=1)
     # for each det, which gt overlaps most with it
     ious_argmax = ious.argmax(axis=1)
@@ -474,23 +474,31 @@ def eval_map(det_results,
         # tp, fp =tpfp_func(cls_dets, cls_gts, cls_gts_ignore,
         #                   [iou_thr for _ in range(num_imgs)],
         #                   [area_ranges for _ in range(num_imgs)])
-        tp = []
-        fp = []
-        for j in range(num_imgs):
-            print(f"now num_imgs {j}")
-            if cls_dets[j].shape[0] == 0:
-                num_dets_1cls_1img = 0
-                tp_temp = np.zeros((num_scales, num_dets_1cls_1img), dtype=np.float32)
-                fp_temp = np.zeros((num_scales, num_dets_1cls_1img), dtype=np.float32)
-                tp.append(tp_temp)
-                fp.append(fp_temp)
-                continue
-            assert cls_dets[j].shape[1] == 27
-            tp_temp, fp_temp = tpfp_orp(cls_dets[j], cls_gts[j], cls_gts_ignore[j],
-                             iou_thr, area_ranges)
-            assert cls_dets[j].shape[1] == 27
-            tp.append(tp_temp)
-            fp.append(fp_temp)
+        # -----------------------
+        # tp = []
+        # fp = []
+        # for j in range(num_imgs):
+        #     # print(f"now num_imgs {j}")
+        #     if cls_dets[j].shape[0] == 0:
+        #         num_dets_1cls_1img = 0
+        #         tp_temp = np.zeros((num_scales, num_dets_1cls_1img), dtype=np.float32)
+        #         fp_temp = np.zeros((num_scales, num_dets_1cls_1img), dtype=np.float32)
+        #         tp.append(tp_temp)
+        #         fp.append(fp_temp)
+        #         continue
+        #     assert cls_dets[j].shape[1] == 27
+        #     tp_temp, fp_temp = tpfp_orp(cls_dets[j], cls_gts[j], cls_gts_ignore[j],
+        #                      iou_thr, area_ranges)
+        #     assert cls_dets[j].shape[1] == 27
+        #     tp.append(tp_temp)
+        #     fp.append(fp_temp)
+        # --------------------------------
+        tpfp = pool.starmap(
+            tpfp_orp,
+            zip(cls_dets, cls_gts, cls_gts_ignore,
+                [iou_thr for _ in range(num_imgs)],
+                [area_ranges for _ in range(num_imgs)]))
+        tp, fp = tuple(zip(*tpfp))
         # calculate gt number of each scale
         # ignored gts or gts beyond the specific scale are not counted
         num_gts = np.zeros(num_scales, dtype=int)

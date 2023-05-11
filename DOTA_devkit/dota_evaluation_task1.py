@@ -13,6 +13,7 @@
 import xml.etree.ElementTree as ET
 import os
 #import cPickle
+import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import polyiou
@@ -118,10 +119,23 @@ def voc_eval(detpath,
     #if not os.path.isdir(cachedir):
      #   os.mkdir(cachedir)
     #cachefile = os.path.join(cachedir, 'annots.pkl')
-    # read list of images
-    with open(imagesetfile, 'r') as f:
+    detfile = detpath.format(classname)
+    with open(detfile, 'r') as f:
         lines = f.readlines()
-    imagenames = [x.strip() for x in lines]
+
+    splitlines = [x.strip().split(' ') for x in lines]
+    image_ids = [x[0] for x in splitlines]
+    confidence = np.array([float(x[1]) for x in splitlines])
+
+    BB = np.array([[float(z) for z in x[2:]] for x in splitlines])
+    # read list of images
+    set_all = True
+    if set_all:
+        imagenames = list(set(image_ids))
+    else:
+        with open(imagesetfile, 'r') as f:
+            lines = f.readlines()
+        imagenames = [x.strip() for x in lines]
     
     recs = {}
     for i, imagename in enumerate(imagenames):
@@ -142,22 +156,25 @@ def voc_eval(detpath,
                                  'det': det}
 
     # read dets from Task1* files
-    detfile = detpath.format(classname)
-    with open(detfile, 'r') as f:
-        lines = f.readlines()
-
-    splitlines = [x.strip().split(' ') for x in lines]
-    image_ids = [x[0] for x in splitlines]
-    confidence = np.array([float(x[1]) for x in splitlines])
-
-    BB = np.array([[float(z) for z in x[2:]] for x in splitlines])
+    # detfile = detpath.format(classname)
+    # with open(detfile, 'r') as f:
+    #     lines = f.readlines()
+    #
+    # splitlines = [x.strip().split(' ') for x in lines]
+    # image_ids = [x[0] for x in splitlines]
+    # confidence = np.array([float(x[1]) for x in splitlines])
+    #
+    # BB = np.array([[float(z) for z in x[2:]] for x in splitlines])
 
     # sort by confidence
     sorted_ind = np.argsort(-confidence)
     sorted_scores = np.sort(-confidence)
 
     ## note the usage only in numpy not for list
+    BB_temp = BB
     BB = BB[sorted_ind, :]
+    # image_ids_temp = image_ids[sorted_ind, :]
+    image_ids_temp = image_ids
     image_ids = [image_ids[x] for x in sorted_ind]
     # go down dets and mark TPs and FPs
     nd = len(image_ids)
@@ -168,7 +185,14 @@ def voc_eval(detpath,
         bb = BB[d, :].astype(float)
         ovmax = -np.inf
         BBGT = R['bbox'].astype(float)
-
+        # img = cv2.imread(f"F:\\360downloads\part1(val\images\\{image_ids[d]}.png")
+        # # img = imread(path)
+        # img = np.ascontiguousarray(img)
+        # pts = bb.reshape((-1, 4, 2)).astype(int)
+        # # 绘制矩形框, 可以一次性画多个, 所以可以跳出循环
+        # cv2.polylines(img, pts, isClosed=True, color=(0, 0, 255), thickness=4)
+        # plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        # plt.show()
         ## compute det bb with each BBGT
         if BBGT.size > 0:
             # compute overlaps
@@ -221,11 +245,12 @@ def voc_eval(detpath,
 
         if ovmax > ovthresh:
             if not R['difficult'][jmax]:
-                if not R['det'][jmax]:
+                if not R['det'][jmax]: # 是第一个匹配这个gt的det
                     tp[d] = 1.
                     R['det'][jmax] = 1
-                else:
+                else: # 被score高的抢占gt
                     fp[d] = 1.
+            # else: is difficult, fp=tp=0
         else:
             fp[d] = 1.
 
@@ -250,9 +275,15 @@ def voc_eval(detpath,
 def main():
     # detpath = r'/mnt/SSD/lwt_workdir/data/dota_angle/result_merge_roitran/{:s}.txt'
     detpath = r'/mnt/SSD/lwt_workdir/data/dota_angle/result_merge_ours/Task1_{:s}.txt'
+    detpath = r'F:\360downloads\valData\txt_out\result_raw/Task1_{:s}.txt'
+    detpath = r'F:\360downloads\OrientedRepPoints-main\tools\parse_pkl\txt_out\result_raw/Task1_{:s}.txt'
     annopath = r'/mnt/SSD/lwt_workdir/data/dota_new/val/labelTxt/{:s}.txt'  # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
+    annopath = r'F:\360downloads\valData\labelTxt/{:s}.txt'  # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
+    annopath = r'F:\360downloads\OrientedRepPoints-main\data\dota_1024\trainval_split\labelTxt/{:s}.txt'  # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
     imagesetfile = r'/mnt/SSD/lwt_workdir/data/dota_new/val/test.txt'
-    
+    imagesetfile = r'F:\360downloads\valData\Textfile/test.txt'
+    imagesetfile = r'F:\360downloads\OrientedRepPoints-main\data\dota_1024\trainval_split/test.txt'
+
     # For DOTA-v1.5
     # classnames = ['plane', 'baseball-diamond', 'bridge', 'ground-track-field', 'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
     #             'basketball-court', 'storage-tank',  'soccer-ball-field', 'roundabout', 'harbor', 'swimming-pool', 'helicopter', 'container-crane']
@@ -260,6 +291,11 @@ def main():
     classnames = ['plane', 'baseball-diamond', 'bridge', 'ground-track-field', 'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
                 'basketball-court', 'storage-tank',  'soccer-ball-field', 'roundabout', 'harbor', 'swimming-pool', 'helicopter']
     classaps = []
+    # classnames = ['plane',   'small-vehicle', 'large-vehicle', 'ship',
+    #
+    #                'storage-tank', 'roundabout', 'harbor', 'swimming-pool',
+    #               ]
+    # classaps = []
     map = 0
     for classname in classnames:
         print('classname:', classname)

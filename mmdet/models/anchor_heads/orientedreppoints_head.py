@@ -181,6 +181,12 @@ class OrientedRepPointsHead(nn.Module):
         # self.reppoints_cls_conv = DeformConv(self.feat_channels,
         #                                      self.point_feat_channels,
         #                                      self.dcn_kernel, 1, self.dcn_pad)
+        self.conv1 = nn.Conv2d(self.feat_channels,
+                                              self.point_feat_channels, 1, 1, 0)
+        self.conv3 = nn.Conv2d(self.feat_channels,
+                                              self.point_feat_channels, 3, 1, 1)
+        self.conv5 = nn.Conv2d(self.feat_channels,
+                                              self.point_feat_channels, 5, 1, 2)
 
     def init_weights(self):
         # 用标准分布初始化网络层权重
@@ -286,7 +292,13 @@ class OrientedRepPointsHead(nn.Module):
         # 然后继续卷积,目标是分类 ;上移了
         # cls_out = self.reppoints_cls_out(self.relu(dcn_cls_feat))
         # 以及,对代表点位置进行进一步微调,reppoints_pts_refine_conv是可形变卷积
-        pts_out_refine = self.reppoints_pts_refine_out(self.relu(self.reppoints_pts_refine_conv(pts_feat, dcn_offset)))
+        # 注只有两通道数相同时才可以用identy  #+ self.conv5(pts_feat_temp) +
+        # pts_feat_temp = torch.cat([pts_feat, dcn_offset], dim=1)
+        dcn_temp = self.reppoints_pts_refine_conv(pts_feat, dcn_offset)
+        norefine_temp = dcn_temp + self.conv1(pts_feat) + self.conv3(pts_feat) + pts_feat
+        pts_out_refine = self.reppoints_pts_refine_out(self.relu(norefine_temp))
+
+        # pts_out_refine = self.reppoints_pts_refine_out(self.relu(self.reppoints_pts_refine_conv(pts_feat, dcn_offset)))
         # 微调的结果加上基础值
         pts_out_refine = pts_out_refine + pts_out_init.detach()
         # 看看只有init会怎样
