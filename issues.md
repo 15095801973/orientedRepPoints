@@ -15,7 +15,7 @@ windows平台,torch大于1.4,遇到过的一些问题
 * 训练时数据莫名其妙少了很多(1/3),是_filter_imgs出现了问题
 * 原代码coco.py中
 ```python
- def _filter_imgs(self, min_size=32):
+def _filter_imgs(self, min_size=32):
         """Filter images too small or without ground truths."""
         valid_inds = []
         ids_with_ann = set(_['image_id'] for _ in self.coco.anns.values())
@@ -39,3 +39,14 @@ def _filter_imgs(self, min_size=32):
                 valid_inds.append(i)
         return valid_inds
 ```
+
+# 问题5: "head'不是内部或外部命令，也不是可运行的程序
+* collect_env.py中 gcc = subprocess.check_output('gcc --version | head -n1', shell=True)
+* 原因在于head -n1 为linux命令 显示1行.而windows系统没有
+* 解决方法为手动在win命令行中输入 gcc --version ;然后把输出结果的第一行粘贴到collect_env.py中.例如我这里是: gcc = "gcc(MinGW.org GCC - 8.2 .0 - 3) 8.2.0"
+
+
+# 问题6: 
+* RuntimeError: view size is not compatible with input tensor's size and stride (at least one dimension spans across two contiguous subspaces). Use .reshape(...) instead
+* 训练时设置中images_per_gpu大于1的时候,在mmdet.ops.dcn处出现上述错误,而等于1的时候正常
+* 虽然不知道为什么会出现这种错误,不过好像还挺常见的,设置为1就可以正常运行正常运行何必要费心费力debug呢?.实际上按照提示把目标文件中的.view全部改成.reshape就可以了.注意要重新编译一遍,只重新编译报错的文件就可以了
